@@ -1,0 +1,1 @@
+{"$schema":"https://json.schemastore.org/claude-code-marketplace.json","name":"lhg-plugs","owner":{"name":"刘洪光"},"plugins":[{"description":"劳动维权助手：纠纷场景→仲裁流程指引→文书模板→证据清单；非律师意见、仅供参考","name":"lhg-labor-rights","source":"./"}]}
