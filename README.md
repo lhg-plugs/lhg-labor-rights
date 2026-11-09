@@ -1,85 +1,99 @@
 <!-- About 简介（推送后填写到仓库 About 栏）：
-劳动维权助手：纠纷场景→仲裁流程指引→文书模板→证据清单 ｜ 一键安装：/plugin marketplace add lhg-plugs/lhg-labor-rights
+劳动维权助手：纠纷场景判定→仲裁/诉讼流程指引→仲裁申请书与证据清单模板→证据三要素体检；非律师意见、仅供参考，时效与管辖等关键问题请咨询执业律师。 ｜ 一键安装：/plugin marketplace add lhg-plugs/lhg-labor-rights
 -->
-<!-- topics（推送后打）：claude-code, claude-plugin, agent-skills, labor-rights, legal-aid, arbitration -->
+<!-- topics（推送后打）：claude-code, claude-plugin, agent-skills, labor-rights, labor-arbitration, legal-aid, evidence, document-template -->
 
-# lhg-labor-rights：劳动维权助手，仲裁维权一条龙
+<p align="center">
+  <img src="./assets/readme/hero.svg" width="100%" alt="lhg-labor-rights — 劳动维权助手">
+</p>
 
-> ⚠️ **声明（首屏置顶）**：本插件是**劳动维权助手**（非"专家"，弱化执业暗示），**非律师意见、仅供参考**；**涉及时效与管辖等关键问题请咨询执业律师**。
->
-> **一句话介绍**：给 AI 编程助手装上"劳动维权助手"——纠纷场景判定 → 仲裁/诉讼流程指引 → 仲裁申请书与证据清单模板 → 证据三要素体检；**胜诉承诺写入即拦截，5 条确定性规则兜底**。
->
-> **一键安装**：在 Claude Code 里运行
-> ```
-> /plugin marketplace add lhg-plugs/lhg-labor-rights
-> /plugin install lhg-labor-rights@lhg-plugs
-> ```
+> **一句话介绍**：劳动维权助手：纠纷场景判定→仲裁/诉讼流程指引→仲裁申请书与证据清单模板→证据三要素体检；非律师意见、仅供参考，时效与管辖等关键问题请咨询执业律师。
+
+**一键安装**：在 Claude Code 里运行
+
+```bash
+/plugin marketplace add lhg-plugs/lhg-labor-rights
+/plugin install lhg-labor-rights@lhg-plugs
+```
+
+## 它能帮你做出什么
+
+- **冒烟全绿**：`python3 smoke_test.py` 53 项全部通过（JSON 合法、frontmatter 完整、命令/skill/agent 齐全）。
 
 ## 它是什么
 
 `lhg-labor-rights` 是一个 Claude Code 插件（plugin 为主、skill 为辅）：
 
-- **4 个命令**（小白入口）：`labor-rights` 维权一条龙，`labor-docs` 文书起草，`labor-evidence` 证据整理，`labor-audit` 文书体检
-- **4 个平台中立 skill**（方法论，可移植到豆包/Workbuddy 等 agent 平台）：纠纷场景判定（八类场景）、仲裁/诉讼流程指引、文书模板（申请书六部分+金额公式）、证据清单（三要素）
-- **2 个助手 agent**：维权流程助手、文书审计员
-- **1 个执业硬门 hook**：写入文件命中执业暗示/胜诉承诺关键词（保证胜诉/包赢/百分百胜诉/律师意见等）直接拦截，"非律师意见"声明不被误拦，可一键关闭
-- **5 条确定性审计规则**：纯 Python 标准库、零第三方依赖，含文书必填字段、1 年时效提醒、证据三要素、管辖表述、非律师意见声明检查
+- **4 个命令**（小白入口）：`labor-audit` 维权文书体检、`labor-docs` 起草仲裁申请书、`labor-evidence` 整理证据清单、`labor-rights` 劳动维权一条龙
+- **4 个平台中立 skill**（方法论，可移植到豆包/Workbuddy 等 agent 平台）：lhg-lr-docs, lhg-lr-evidence, lhg-lr-process, lhg-lr-scenario
+- **2 个专家 agent**：advisor, doc-checker
+- **1 个 hooks**（`hooks/`：pre_lawyer_gate.py），关键操作前自动把关
 
-## 合规设计：三层防护
+## 为什么是它
 
-1. **声明置顶**：README 首屏、每个 SKILL.md 开头、每条命令输出末尾，都有显著的"非律师意见"声明。
-2. **写入硬门**：hook 在文件写入前扫描执业暗示/胜诉承诺关键词，命中即拦截（exit 2）；`LHG_LABORRIGHTS_ADVICE_OFF=1` 可关闭。
-3. **审计兜底**：`rights_audit.py` 的 5 条规则（4 blocker + 1 warning），`labor-audit` 命令逐条清零。
+不是一个 prompt，而是一套互相兜底的机制：
 
-## 4 个命令用法
+1. **硬门，不是提醒**：hooks 在关键操作前自动拦截或警告（见 `hooks/`），而不是只在文档里写一句"请注意"。
+2. **方法论沉淀在 skill 里**：流程、检查清单、口径都写在 `skills/` 的方法论里，命令只是入口；换个 agent 平台也能复用同一套做法。
+3. **可验，不是可信**：`fixtures/` 备有坏/好对照用例，`smoke_test.py` 一键验证，规则有没有生效、自己跑一遍就知道。
+
+## 快速上手
+
+```bash
+# 1. 安装（Claude Code 里运行）
+/plugin marketplace add lhg-plugs/lhg-labor-rights
+/plugin install lhg-labor-rights@lhg-plugs
+
+# 2. 劳动维权一条龙：纠纷场景判定 → 仲裁/诉讼流程指引 → 文书模板起草 → 证据
+/lhg-labor-rights:labor-rights "公司欠我三个月工资"
+```
 
 | 命令 | 作用 | 示例 |
 |---|---|---|
-| `/lhg-labor-rights:labor-rights` | 场景→流程→文书→证据一条龙 | `/lhg-labor-rights:labor-rights "公司欠我三个月工资"` |
-| `/lhg-labor-rights:labor-docs` | 起草仲裁申请书（六部分模板） | `/lhg-labor-rights:labor-docs "违法解除" "2022年3月入职"` |
-| `/lhg-labor-rights:labor-evidence` | 整理证据清单（三要素） | `/lhg-labor-rights:labor-evidence ./我的材料` |
-| `/lhg-labor-rights:labor-audit` | 体检：字段/时效/证据/管辖/声明 | `/lhg-labor-rights:labor-audit ./维权材料` |
+| `/lhg-labor-rights:labor-audit` | 维权文书体检：跑确定性审计脚本，5 条规则（必填字段/时效/证据三要素/管辖/声明）逐条清零。 | `/lhg-labor-rights:labor-audit ./维权材料` |
+| `/lhg-labor-rights:labor-docs` | 起草仲裁申请书：六部分模板 + 金额公式重算 + 必填字段自查，审计通过再交付。 | `/lhg-labor-rights:labor-docs "违法解除" "2022年3月入职"` |
+| `/lhg-labor-rights:labor-evidence` | 整理证据清单：五类证据逐项过关 → 三要素标注 → 输出 evidence.json + 证据缺口清单。 | `/lhg-labor-rights:labor-evidence ./我的材料` |
+| `/lhg-labor-rights:labor-rights` | 劳动维权一条龙：纠纷场景判定 → 仲裁/诉讼流程指引 → 文书模板起草 → 证据清单整理（附非律师意见声明）。 | `/lhg-labor-rights:labor-rights "公司欠我三个月工资"` |
+
+## 什么时候用 / 什么时候不用（FAQ）
+
+**什么时候用：**
+
+- 你需要维权文书体检时 → 用 `/lhg-labor-rights:labor-audit`
+- 你需要起草仲裁申请书时 → 用 `/lhg-labor-rights:labor-docs`
+- 你需要整理证据清单时 → 用 `/lhg-labor-rights:labor-evidence`
+
+**什么时候不用：**
+
+- 你只需要其中一个零散能力时 → 本插件是成套流程，单点需求用更轻量的 skill 更合适
+- 你希望 AI 完全自由发挥、不接受任何自查与硬门时 → 它的规则审计与 hooks 会介入（可关，但那就别装它）
+- ⚠️ 声明（首屏置顶）：本插件是劳动维权助手（非"专家"，弱化执业暗示），非律师意见、仅供参考；涉及时效与管辖等关键问题请咨询执业律师。
+- 你的场景不在上面命令表覆盖范围内时 → 先看命令表，没有对应命令就别硬套
 
 ## 目录结构
 
 ```
 lhg-labor-rights/
-├── .claude-plugin/          # plugin.json（插件清单）+ marketplace.json（本仓即市场）
-├── commands/                # 4 个命令：labor-rights / labor-docs / labor-evidence / labor-audit
-├── skills/                  # 4 个平台中立 skill（场景/流程/文书/证据，声明置顶）
-├── agents/                  # 2 个助手 agent（advisor / doc-checker）
-├── hooks/                   # 执业暗示/胜诉承诺拦截 hook（fail-open，可一键关闭）
-├── scripts/audit/           # 确定性审计：rights_audit.py（零第三方依赖）
-├── fixtures/                # 好/坏对照用例
-├── smoke_test.py            # 冒烟测试
-├── ATTRIBUTION.md           # 灵感来源声明
-└── LICENSE                  # MIT
+├── smoke_test.py          # 一键冒烟测试
+├── ATTRIBUTION.md         # 灵感来源与许可声明
+├── LICENSE                # MIT
+├── README.md              # 本文件
+├── .claude-plugin/
+├── agents/
+├── commands/
+├── fixtures/
+├── hooks/
+├── scripts/
+├── skills/
 ```
-
-## 什么时候用 / 什么时候不用（FAQ）
-
-**什么时候用**
-- 被欠薪/违法解除/没签合同，不知道能主张什么 → `labor-rights` 一条龙
-- 决定仲裁了，不会写申请书 → `labor-docs` 按模板起草
-- 材料一堆，不知道哪些有用 → `labor-evidence` 整理成三要素清单
-- 文书写完了，不确定全不全 → `labor-audit` 体检
-
-**什么时候不用**
-- 想要"这个官司能不能赢"的结论 → 本插件**不给**，请咨询执业律师
-- 想要律师代理出庭 → 本插件是助手不是律所，请找执业律师
-- 工伤/社保等需要行政程序前置的复杂案件 → 本插件只给框架，个案请咨询律师
-- 想伪造证据"让案子更稳" → **直接拒绝**，这是违法的
 
 ## 自检与反馈
 
-本插件自带质检：每次使用后可跑 `python3 smoke_test.py` 一键验证（JSON 合法、skill/command/agent 完整性、5 条规则、fixtures 命中、hooks 行为）。
+本插件自带质检：每次使用后可跑 `python3 smoke_test.py` 一键验证（本次实测 53 项全部通过）。
 
 发现 bug 或有改进建议，以 `[QC] <一句话问题>` 为标题提交到 https://github.com/lhg-plugs/lhg-labor-rights/issues，正文写清"复现步骤 → 实际表现 → 期望表现"。
 
-| 插件 | 一句话 | 安装 |
-|---|---|---|
-| [lhg-fullstack](https://github.com/lhg-plugs/lhg-fullstack) | 小白一句话 → 高质量全栈应用 | `/plugin install lhg-fullstack@lhg-plugs` |
-| *（后续插件在此追加，保持表格格式一致）* | | |
+同门插件见 [lhg-plugs](https://github.com/lhg-plugs)，86 个插件的完整矩阵在 [marketplace](https://github.com/lhg-plugs/marketplace) 维护。
 
 ## 出品：刘洪光
 
